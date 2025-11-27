@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Use Demo - API Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .chat-container {
+            height: 500px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f9f9f9;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+
+        .message.system {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            font-size: 13px;
+            max-width: 100%;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            max-width: 100%;
+        }
+
+        .message.tool {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            font-size: 13px;
+            max-width: 100%;
+        }
+
+        .message-header {
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-connected {
+            background: #28a745;
+        }
+
+        .status-disconnected {
+            background: #dc3545;
+        }
+
+        .status-processing {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .session-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .session-info p {
+            margin-bottom: 5px;
+        }
+
+        .vnc-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+
+        .vnc-frame {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .thinking {
+            font-style: italic;
+            color: #666;
+            background: #f0f0f0;
+            padding: 10px;
+            border-left: 3px solid #667eea;
+            margin: 10px 0;
+        }
+
+        .screenshot {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .sessions-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .session-item:hover {
+            background: #f0f0f0;
+            border-color: #667eea;
+        }
+
+        .session-item.active {
+            background: #e8ecff;
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🖥️ Computer Use Demo - API Interface</h1>
+            <p>FastAPI backend with real-time WebSocket streaming, session management, and VNC access</p>
+        </div>
+
+        <div class="main-grid">
+            <!-- Session Management Panel -->
+            <div class="panel">
+                <h2>Session Management</h2>
+                
+                <div class="form-group">
+                    <label>Model</label>
+                    <select id="model">
+                        <option value="claude-sonnet-4-5-20250929">Claude Sonnet 4.5 (Latest)</option>
+                        <option value="claude-opus-4-5-20251101">Claude Opus 4.5</option>
+                        <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Provider</label>
+                    <select id="provider">
+                        <option value="anthropic">Anthropic</option>
+                        <option value="bedrock">AWS Bedrock</option>
+                        <option value="vertex">Google Vertex AI</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>System Prompt Suffix (Optional)</label>
+                    <textarea id="systemPrompt" rows="3" placeholder="Additional instructions for the agent..."></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="createSession()">Create New Session</button>
+                <button class="btn btn-secondary" onclick="loadSessions()">Refresh Sessions</button>
+
+                <div id="currentSession" class="session-info" style="display: none;">
+                    <p><strong>Active Session:</strong></p>
+                    <p>ID: <code id="sessionId"></code></p>
+                    <p>Model: <code id="sessionModel"></code></p>
+                    <p>Status: <span class="status-indicator" id="statusIndicator"></span><span id="connectionStatus">Disconnected</span></p>
+                </div>
+
+                <h3 style="margin-top: 20px; margin-bottom: 10px;">Recent Sessions</h3>
+                <div id="sessionsList" class="sessions-list">
+                    <p style="color: #999;">No sessions yet. Create one to get started!</p>
+                </div>
+            </div>
+
+            <!-- Chat Interface Panel -->
+            <div class="panel">
+                <h2>Chat Interface</h2>
+                
+                <div id="chatContainer" class="chat-container">
+                    <div class="message system">
+                        <div class="message-header">System</div>
+                        Create a session and start chatting with the AI agent!
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="messageInput" rows="3" placeholder="Type your message here..." disabled></textarea>
+                </div>
+
+                <button class="btn btn-primary" onclick="sendMessage()" id="sendBtn" disabled>Send Message</button>
+                <button class="btn btn-secondary" onclick="clearChat()">Clear Chat</button>
+            </div>
+        </div>
+
+        <!-- VNC Viewer Panel -->
+        <div class="vnc-container">
+            <h2>Virtual Desktop (VNC)</h2>
+            <p style="margin-bottom: 15px; color: #666;">
+                Watch the AI agent interact with the virtual desktop in real-time
+            </p>
+            <iframe id="vncFrame" class="vnc-frame" src="about:blank"></iframe>
+            <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                <strong>VNC Info:</strong> <span id="vncInfo">Loading...</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentSessionId = null;
+        let websocket = null;
+        const API_BASE = window.location.origin;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSessions();
+            loadVNCInfo();
+            
+            // Enable Enter to send message
+            document.getElementById('messageInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        });
+
+        // Session Management
+        async function createSession() {
+            const model = document.getElementById('model').value;
+            const provider = document.getElementById('provider').value;
+            const systemPrompt = document.getElementById('systemPrompt').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model,
+                        provider,
+                        system_prompt_suffix: systemPrompt || null
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to create session');
+
+                const session = await response.json();
+                await selectSession(session.id);
+                await loadSessions();
+                
+                addSystemMessage(`Session created successfully! ID: ${session.id}`);
+            } catch (error) {
+                addErrorMessage(`Failed to create session: ${error.message}`);
+            }
+        }
+
+        async function loadSessions() {
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions`);
+                const sessions = await response.json();
+
+                const container = document.getElementById('sessionsList');
+                
+                if (sessions.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">No sessions yet. Create one to get started!</p>';
+                    return;
+                }
+
+                container.innerHTML = sessions.map(s => `
+                    <div class="session-item ${s.id === currentSessionId ? 'active' : ''}" 
+                         onclick="selectSession('${s.id}')">
+                        <strong>${s.model}</strong> (${s.provider})<br>
+                        <small>Created: ${new Date(s.created_at).toLocaleString()}</small>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Failed to load sessions:', error);
+            }
+        }
+
+        async function selectSession(sessionId) {
+            currentSessionId = sessionId;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions/${sessionId}`);
+                const session = await response.json();
+
+                document.getElementById('sessionId').textContent = session.id;
+                document.getElementById('sessionModel').textContent = `${session.model} (${session.provider})`;
+                document.getElementById('currentSession').style.display = 'block';
+                document.getElementById('messageInput').disabled = false;
+                document.getElementById('sendBtn').disabled = false;
+
+                // Load messages
+                await loadMessages(sessionId);
+
+                // Connect WebSocket
+                connectWebSocket(sessionId);
+
+                // Update UI
+                loadSessions();
+            } catch (error) {
+                addErrorMessage(`Failed to select session: ${error.message}`);
+            }
+        }
+
+        async function loadMessages(sessionId) {
+            try {
+                const response = await fetch(`${API_BASE}/api/sessions/${sessionId}/messages`);
+                const messages = await response.json();
+
+                clearChat();
+
+                messages.forEach(msg => {
+                    msg.content.forEach(block => {
+                        if (block.type === 'text') {
+                            addMessage(msg.role, block.text);
+                        }
+                    });
+                });
+            } catch (error) {
+                console.error('Failed to load messages:', error);
+            }
+        }
+
+        // WebSocket Connection
+        function connectWebSocket(sessionId) {
+            if (websocket) {
+                websocket.close();
+            }
+
+            const wsUrl = `${API_BASE.replace('http', 'ws')}/ws/${sessionId}`;
+            websocket = new WebSocket(wsUrl);
+
+            websocket.onopen = () => {
+                updateConnectionStatus('connected');
+                addSystemMessage('Connected to session');
+            };
+
+            websocket.onclose = () => {
+                updateConnectionStatus('disconnected');
+                addSystemMessage('Disconnected from session');
+            };
+
+            websocket.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateConnectionStatus('disconnected');
+            };
+
+            websocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'text':
+                    addMessage('assistant', data.text);
+                    break;
+                
+                case 'thinking':
+                    addThinking(data.thinking);
+                    break;
+                
+                case 'tool_use':
+                    addToolUse(data.tool_name, data.tool_input);
+                    break;
+                
+                case 'tool_result':
+                    addToolResult(data);
+                    break;
+                
+                case 'status':
+                    updateStatus(data.status, data.message);
+                    break;
+                
+                case 'error':
+                    addErrorMessage(data.error);
+                    updateConnectionStatus('connected');
+                    break;
+                
+                case 'user_message':
+                    // Already added when sending
+                    break;
+            }
+        }
+
+        // Message Handling
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+
+            if (!content || !currentSessionId) return;
+
+            // Add to UI immediately
+            addMessage('user', content);
+            input.value = '';
+
+            try {
+                // Send via WebSocket
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({
+                        type: 'message',
+                        content: content
+                    }));
+                } else {
+                    // Fallback to HTTP
+                    await fetch(`${API_BASE}/api/sessions/${currentSessionId}/messages`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content })
+                    });
+                }
+            } catch (error) {
+                addErrorMessage(`Failed to send message: ${error.message}`);
+            }
+        }
+
+        // UI Updates
+        function addMessage(role, content) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.textContent = role.charAt(0).toUpperCase() + role.slice(1);
+            
+            div.appendChild(header);
+            div.appendChild(document.createTextNode(content));
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addSystemMessage(content) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'message system';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.textContent = 'System';
+            
+            div.appendChild(header);
+            div.appendChild(document.createTextNode(content));
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addErrorMessage(content) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'message error';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.textContent = 'Error';
+            
+            div.appendChild(header);
+            div.appendChild(document.createTextNode(content));
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addThinking(content) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'thinking';
+            div.textContent = `💭 ${content}`;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addToolUse(toolName, toolInput) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'message tool';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.textContent = `🔧 Tool: ${toolName}`;
+            
+            div.appendChild(header);
+            div.appendChild(document.createTextNode(JSON.stringify(toolInput, null, 2)));
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addToolResult(result) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'message tool';
+            
+            const header = document.createElement('div');
+            header.className = 'message-header';
+            header.textContent = '✅ Tool Result';
+            
+            div.appendChild(header);
+            
+            if (result.output) {
+                div.appendChild(document.createTextNode(result.output));
+            }
+            
+            if (result.error) {
+                div.appendChild(document.createTextNode(`Error: ${result.error}`));
+            }
+            
+            if (result.base64_image) {
+                const img = document.createElement('img');
+                img.className = 'screenshot';
+                img.src = `data:image/png;base64,${result.base64_image}`;
+                div.appendChild(img);
+            }
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateConnectionStatus(status) {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('connectionStatus');
+            
+            indicator.className = 'status-indicator';
+            
+            if (status === 'connected') {
+                indicator.classList.add('status-connected');
+                statusText.textContent = 'Connected';
+            } else if (status === 'processing') {
+                indicator.classList.add('status-processing');
+                statusText.textContent = 'Processing...';
+            } else {
+                indicator.classList.add('status-disconnected');
+                statusText.textContent = 'Disconnected';
+            }
+        }
+
+        function updateStatus(status, message) {
+            if (status === 'processing') {
+                updateConnectionStatus('processing');
+            } else {
+                updateConnectionStatus('connected');
+            }
+            
+            if (message) {
+                addSystemMessage(message);
+            }
+        }
+
+        function clearChat() {
+            document.getElementById('chatContainer').innerHTML = '';
+        }
+
+        // VNC
+        async function loadVNCInfo() {
+            try {
+                const response = await fetch(`${API_BASE}/api/vnc/info`);
+                const info = await response.json();
+                
+                document.getElementById('vncInfo').innerHTML = `
+                    <a href="${info.novnc_url}" target="_blank">Open in new window</a> | 
+                    Host: ${info.vnc_host}:${info.vnc_port}
+                `;
+                
+                // Load VNC in iframe
+                document.getElementById('vncFrame').src = info.novnc_url;
+            } catch (error) {
+                document.getElementById('vncInfo').textContent = 'VNC not available';
+                console.error('Failed to load VNC info:', error);
+            }
+        }
+    </script>
+</body>
+</html>
